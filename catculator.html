@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catculator</title>
+    <!-- 1. Load Tailwind CSS --><script src="https://cdn.tailwindcss.com"></script>
+    <!-- 2. Load Math.js library for symbolic differentiation --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.8.0/math.min.js"></script>
+    <style>
+        /* Use Inter font */
+        body {
+            font-family: "Inter", sans-serif;
+        }
+        /* Style for katex-style math output if we add it, but for now just good typography */
+        .math-output {
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 1.25rem;
+            color: #1a202c; /* gray-900 */
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+    
+    <div class="max-w-4xl w-full space-y-8">
+        
+        <!-- Main Calculator Card --><div class="bg-white p-8 md:p-10 shadow-xl rounded-2xl">
+            <!-- New flex container for title and GIFs --><div class="flex justify-center items-center mb-2">
+                <img 
+                    src="https://media.tenor.com/_WZy7E7hoTcAAAAM/cat-smile.gif" 
+                    alt="Cat GIF" 
+                    class="w-16 h-16 md:w-20 md:h-20 rounded-2xl mx-4 object-cover"
+                    onerror="this.src='https://placehold.co/64x64/ede9fe/6d28d9?text=CAT'"
+                >
+                <h1 class="text-3xl font-bold text-center text-indigo-600">
+                    Dericative Catculator
+                </h1>
+                <img 
+                    src="https://media.tenor.com/pdX9YTI4_eoAAAAM/cat-cat-with-tongue.gif" 
+                    alt="Cat GIF" 
+                    class="w-16 h-16 md:w-20 md:h-20 rounded-2xl mx-4 object-cover"
+                    onerror="this.src='https://placehold.co/64x64/ede9fe/6d28d9?text=CAT'"
+                >
+            </div>
+            <p class="text-center text-gray-600 mb-6">
+                Enter a function with respect to 'x' (e.g., <code>x^2 + sin(x)</code>).
+            </p>
+
+            <div class="space-y-4">
+                <!-- Input Section --><div>
+                    <label for="function-input" class="block text-sm font-medium text-gray-700">
+                        Function f(x)
+                    </label>
+                    <div class="mt-1">
+                        <input 
+                            type="text" 
+                            id="function-input" 
+                            class="appearance-none block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                            placeholder="e.g., 5*x^3 + 2*x"
+                            value="x^2"
+                        >
+                    </div>
+                </div>
+                
+                <!-- Button --><div>
+                    <button 
+                        id="calculate-btn"
+                        class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors"
+                    >
+                        Calculate Derivative👍
+                    </button>
+                </div>
+
+                <!-- Error Message --><div id="error-message" class="hidden p-4 bg-red-100 text-red-700 rounded-lg">
+                    <!-- Error text will be inserted here --></div>
+
+                <!-- Results Section --><div id="results-container" class="space-y-4 pt-4 hidden">
+                    <div>
+                        <h3 class="text-lg font-medium text-gray-900">Original Function</h3>
+                        <p id="original-function" class="mt-1 p-3 bg-gray-50 rounded-lg math-output">f(x) = x^2</p>
+                    </div>
+                    
+                    <div>
+                        <h3 class="text-lg font-medium text-gray-900">Derivative (f'(x)): PALDOOO!!</h3>
+                        <p id="derivative-output" class="mt-1 p-3 bg-gray-50 rounded-lg math-output"><!-- Derivative will be here --></p>
+                    </div>
+
+                    <!-- Simplified Output with Thumbs Up Cat GIF -->
+                    <div class="flex items-center space-x-3"> 
+                        <h3 class="text-lg font-medium text-gray-900">Simplified Derivative</h3>
+                        <img 
+                            src="https://media.tenor.com/NTeRUfGwLb4AAAAM/cat-thumbs-up.gif" 
+                            alt="Cat Thumbs Up" 
+                            class="rounded-lg object-cover w-[1.5in] h-[1.5in] shadow-md"
+                            onerror="this.src='https://placehold.co/64x64/ede9fe/6d28d9?text=OK'"
+                        >
+                    </div>
+                    <p id="simplified-output" class="mt-1 p-3 bg-gray-50 rounded-lg math-output"><!-- Simplified derivative will be here --></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Common Rules Reference --><div class="bg-white p-8 md:p-10 shadow-xl rounded-2xl">
+            <h2 class="text-2xl font-bold text-center text-gray-800 mb-6">
+                Common Differentiation Rules
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                
+                <!-- Rule Card: Constant --><div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                    <h3 class="font-semibold text-indigo-600">1. Constant Rule</h3>
+                    <p class="math-output">d/dx (c) = 0</p>
+                    <p class="text-sm text-gray-600">The derivative of any constant is zero.</p>
+                </div>
+
+                <!-- Rule Card: Power --><div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                    <h3 class="font-semibold text-indigo-600">2. Power Rule</h3>
+                    <p class="math-output">d/dx (xⁿ) = n * xⁿ⁻¹</p>
+                    <p class="text-sm text-gray-600">Bring the exponent down and subtract one from it.</p>
+                </div>
+
+                <!-- Rule Card: Constant Multiple --><div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                    <h3 class="font-semibold text-indigo-600">3. Constant Multiple Rule</h3>
+                    <p class="math-output">d/dx [c*f(x)] = c * f'(x)</p>
+                    <p class="text-sm text-gray-600">The derivative of a constant times a function is the constant times the derivative.</p>
+                </div>
+
+                <!-- Rule Card: Sum/Difference --><div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                    <h3 class="font-semibold text-indigo-600">4. Sum/Difference Rule</h3>
+                    <p class="math-output">d/dx [f(x) ± g(x)] = f'(x) ± g'(x)</p>
+                    <p class="text-sm text-gray-600">The derivative of a sum is the sum of the derivatives.</p>
+                </div>
+
+                <!-- Rule Card: Product --><div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                    <h3 class="font-semibold text-indigo-600">5. Product Rule</h3>
+                    <p class="math-output">d/dx [f(x)g(x)] = f(x)g'(x) + g(x)f'(x)</p>
+                    <p class="text-sm text-gray-600">"First d-second plus second d-first."</p>
+                </div>
+
+                <!-- Rule Card: Quotient --><div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                    <h3 class="font-semibold text-indigo-600">6. Quotient Rule</h3>
+                    <p class="math-output">d/dx [f(x)/g(x)] = [g(x)f'(x) - f(x)g'(x)] / [g(x)]²</p>
+                    <p class="text-sm text-gray-600">"Low d-high minus high d-low, over low-low."</p>
+                </div>
+
+                <!-- Rule Card: Chain Rule (General Power) --><div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                    <h3 class="font-semibold text-indigo-600">7. Chain Rule (Power Rule)</h3>
+                    <p class="math-output">d/dx [uⁿ] = n * uⁿ⁻¹ * u'</p>
+                    <p class="text-sm text-gray-600">Used when the "inside" of a power is a function, `u`.</p>
+                </div>
+
+            </div>
+            <p class="text-center text-gray-500 mt-6 text-sm">
+                The calculator above can solve derivatives using all these rules and more, including product, chain, and trigonometric rules.
+            </p>
+        </div>
+
+    </div>
+
+    <script>
+        // Get elements
+        const functionInput = document.getElementById('function-input');
+        const calculateBtn = document.getElementById('calculate-btn');
+        const resultsContainer = document.getElementById('results-container');
+        const errorMessage = document.getElementById('error-message');
+        
+        const originalFunctionEl = document.getElementById('original-function');
+        const derivativeOutputEl = document.getElementById('derivative-output');
+        const simplifiedOutputEl = document.getElementById('simplified-output');
+
+        // Function to perform calculation
+        function calculateDerivative() {
+            const expression = functionInput.value;
+            
+            if (!expression) {
+                showError("Please enter a function.");
+                return;
+            }
+
+            try {
+                // 1. Calculate the derivative
+                const derivative = math.derivative(expression, 'x');
+                
+                // 2. Calculate the simplified version
+                const simplified = math.simplify(derivative);
+
+                // 3. Display the results
+                originalFunctionEl.textContent = `f(x) = ${expression}`;
+                derivativeOutputEl.textContent = `f'(x) = ${derivative.toString()}`;
+                simplifiedOutputEl.textContent = `f'(x) = ${simplified.toString()}`;
+                
+                // Show results and hide error
+                resultsContainer.classList.remove('hidden');
+                errorMessage.classList.add('hidden');
+
+            } catch (err) {
+                // Handle parsing errors
+                showError(`Invalid function: ${err.message}`);
+            }
+        }
+
+        // Function to show error messages
+        function showError(message) {
+            errorMessage.textContent = message;
+            errorMessage.classList.remove('hidden');
+            resultsContainer.classList.add('hidden');
+        }
+
+        // Add event listener to the button
+        calculateBtn.addEventListener('click', calculateDerivative);
+
+        // Also allow pressing 'Enter' in the input field
+        functionInput.addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                calculateDerivative();
+            }
+        });
+
+        // Run a calculation on page load for the default value
+        window.onload = calculateDerivative;
+
+    </script>
+</body>
+</html>
